@@ -168,7 +168,7 @@ OpenRelTable::~OpenRelTable()
 
 int OpenRelTable::getFreeOpenRelTableEntry()
 {
-    for (int i = 0; i < MAX_OPEN; i++)
+    for (int i = 2; i < MAX_OPEN; i++)
     {
         if (tableMetaInfo[i].free == true)
         {
@@ -281,8 +281,9 @@ int OpenRelTable::closeRel(int relId)
     {
         Attribute record[RELCAT_NO_ATTRS];
         RelCacheTable::relCatEntryToRecord(&RelCacheTable::relCache[relId]->relCatEntry, record);
-        RelCacheTable::resetSearchIndex(RELCAT_RELID);
-        RecId recId = BlockAccess::linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, record[RELCAT_REL_NAME_INDEX], EQ);
+        // RelCacheTable::resetSearchIndex(RELCAT_RELID);
+        // RecId recId = BlockAccess::linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, record[RELCAT_REL_NAME_INDEX], EQ);
+        RecId recId = RelCacheTable::relCache[relId]->recId;
 
         RecBuffer relCatBlock(recId.block);
         relCatBlock.setRecord(record, recId.slot);

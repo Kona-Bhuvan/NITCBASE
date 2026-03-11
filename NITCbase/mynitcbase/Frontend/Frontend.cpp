@@ -53,29 +53,43 @@ int Frontend::insert_into_table_values(char relname[ATTR_SIZE], int attr_count, 
 
 int Frontend::select_from_table(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE])
 {
-  // Algebra::project
-  return SUCCESS;
+  return Algebra::project(relname_source, relname_target);
 }
 
-int Frontend::select_attrlist_from_table(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
-                                         int attr_count, char attr_list[][ATTR_SIZE])
+int Frontend::select_attrlist_from_table(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE], int attr_count, char attr_list[][ATTR_SIZE])
 {
-  // Algebra::project
-  return SUCCESS;
+  return Algebra::project(relname_source, relname_target, attr_count, attr_list);
 }
 
-int Frontend::select_from_table_where(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
-                                      char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE])
+int Frontend::select_from_table_where(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE], char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE])
 {
   return Algebra::select(relname_source, relname_target, attribute, op, value);
 }
 
-int Frontend::select_attrlist_from_table_where(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
-                                               int attr_count, char attr_list[][ATTR_SIZE],
-                                               char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE])
+int Frontend::select_attrlist_from_table_where(
+    char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
+    int attr_count, char attr_list[][ATTR_SIZE],
+    char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE])
 {
-  // Algebra::select + Algebra::project??
-  return SUCCESS;
+  int ret = Algebra::select(relname_source, TEMP, attribute, op, value);
+  if (ret != SUCCESS)
+  {
+    return ret;
+  }
+
+  int relId = OpenRelTable::openRel(TEMP);
+  if (relId < 0)
+  {
+    Schema::deleteRel(TEMP);
+    return relId;
+  }
+
+  ret = Algebra::project(TEMP, relname_target, attr_count, attr_list);
+
+  OpenRelTable::closeRel(relId);
+  Schema::deleteRel(TEMP);
+
+  return ret;
 }
 
 int Frontend::select_from_join_where(char relname_source_one[ATTR_SIZE], char relname_source_two[ATTR_SIZE],

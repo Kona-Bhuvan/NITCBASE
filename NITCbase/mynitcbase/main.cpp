@@ -379,6 +379,62 @@ void stage8ex3()
 	*/
 }
 
+void stage9ex1()
+{
+	/*
+	CREATE TABLE Toys(id NUM, name STR, colour STR, stock NUM);
+	OPEN TABLE Toys;
+	INSERT INTO Toys VALUES FROM toys.csv;
+
+	SELECT name,colour FROM Toys INTO ToyColours;
+	SELECT * FROM Toys INTO ToysForSale WHERE stock > 3000;
+	SELECT * FROM Toys INTO ToysToReorder WHERE stock <= 1000;
+	SELECT * FROM Toys INTO ToysCopy;
+	SELECT id,name FROM Toys INTO BlueToys WHERE colour = blue;
+	CLOSE TABLE Toys;
+
+	PRINT TABLE ToyColours;
+	PRINT TABLE ToysForSale;
+	PRINT TABLE ToysToReorder;
+	PRINT TABLE ToysCopy;
+	PRINT TABLE BlueToys;
+
+	EXPORT ToyColours toy_colours.csv;
+	EXPORT ToysForSale toys_for_sale.csv;
+	EXPORT ToysToReorder toys_to_reorder.csv;
+	EXPORT ToysCopy toys_copy.csv;
+	EXPORT BlueToys blue_toys.csv;
+	*/
+}
+void stage9ex2()
+{
+	/*
+	SELECT * FROM Toys INTO ToysForSale WHERE stock > ten;
+	SELECT * FROM Toys INTO Toys WHERE stock > 10;
+	SELECT id,name,size FROM Toys INTO ToySizes;
+
+	#Error: Mismatch in attribute type
+	#Error: Relation already exists
+	#Error: Attribute does not exist
+	*/
+}
+void stage9ex3()
+{
+	/*
+	CREATE TABLE QuizMarks(rollNo STR, name STR, cgpa NUM, quizMarks NUM, location STR);
+	OPEN TABLE QuizMarks;
+	INSERT INTO QuizMarks VALUES FROM quizmarks.csv;
+
+	SELECT * FROM QuizMarks INTO QMg8CGPA WHERE cgpa > 8;
+	OPEN TABLE QMg8CGPA;
+	SELECT * FROM QMg8CGPA INTO Scholarship WHERE quizMarks > 85;
+	OPEN TABLE Scholarship;
+	SELECT rollNo,name FROM Scholarship INTO Kerala WHERE location = Kerala;
+	SELECT rollNo,name FROM Scholarship INTO Gujarat WHERE location = Gujarat;
+	SELECT rollNo,name FROM Scholarship INTO Telangana WHERE location = Telangana;
+	*/
+}
+
 int main(int argc, char *argv[])
 {
 	/* Initialize the Run Copy of Disk */
@@ -414,6 +470,10 @@ int main(int argc, char *argv[])
 	// stage8ex1();  /* Testing CREATE TABLE and DROP TABLE from file using RUN */
 	// stage8ex2();	 /* DUMPing RELCAT and ATTRCAT */
 	// stage8ex3();  /* Checking Error Conditions */
+
+	// stage9ex1();  /* Testing different SELECT operations */
+	// stage9ex2();  /* Checking Error Conditions */
+	// stage9ex3();  /* Implementing multi-step SELECT operations */
 
 	return FrontendInterface::handleFrontend(argc, argv);
 	// return 0;

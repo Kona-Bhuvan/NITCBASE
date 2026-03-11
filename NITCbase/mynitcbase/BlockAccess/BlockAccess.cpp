@@ -34,24 +34,21 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
         Attribute rec[header.numAttrs];
         recBuffer.getRecord(rec, slot);
 
-        unsigned char *slotMap = (unsigned char *)malloc(header.numSlots * sizeof(unsigned char));
+        unsigned char slotMap[header.numSlots];
         recBuffer.getSlotMap(slotMap);
 
         if (slot >= header.numSlots)
         {
             block = header.rblock;
             slot = 0;
-            free(slotMap);
+            continue;
+        }
+        else if (slotMap[slot] == SLOT_UNOCCUPIED)
+        {
+            slot++;
             continue;
         }
 
-        if (slotMap[slot] == SLOT_UNOCCUPIED)
-        {
-            slot++;
-            free(slotMap);
-            continue;
-        }
-        free(slotMap);
         AttrCatEntry attrCatBuf;
         AttrCacheTable::getAttrCatEntry(relId, attrName, &attrCatBuf);
         union Attribute attr = rec[attrCatBuf.offset];
@@ -292,9 +289,7 @@ int BlockAccess::insert(int relId, Attribute *record)
 
 int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], Attribute attrVal, int op)
 {
-    RecId recId;
-    RelCacheTable::resetSearchIndex(relId);
-    recId = linearSearch(relId, attrName, attrVal, op);
+    RecId recId = linearSearch(relId, attrName, attrVal, op);
     if (recId.block == -1 && recId.slot == -1)
         return E_NOTFOUND;
 
@@ -419,6 +414,70 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE])
     RelCacheTable::getRelCatEntry(ATTRCAT_RELID, &relCatEntry);
     relCatEntry.numRecs = relCatEntry.numRecs - numberOfAttributesDeleted;
     RelCacheTable::setRelCatEntry(ATTRCAT_RELID, &relCatEntry);
+
+    return SUCCESS;
+}
+
+/*
+NOTE: the caller is expected to allocate space for the argument `record` based
+      on the size of the relation. This function will only copy the result of
+      the projection onto the array pointed to by the argument.
+*/
+int BlockAccess::project(int relId, Attribute *record)
+{
+    RecId prevRecId;
+    RelCacheTable::getSearchIndex(relId, &prevRecId);
+
+    int block, slot;
+
+    if (prevRecId.block == -1 && prevRecId.slot == -1)
+    {
+        RelCatEntry relCatEntry;
+        RelCacheTable::getRelCatEntry(relId, &relCatEntry);
+        block = relCatEntry.firstBlk;
+        slot = 0;
+    }
+    else
+    {
+        block = prevRecId.block;
+        slot = prevRecId.slot + 1;
+    }
+
+    while (block != -1)
+    {
+        RecBuffer recBuffer(block);
+
+        HeadInfo header;
+        recBuffer.getHeader(&header);
+
+        unsigned char slotMap[header.numSlots];
+        recBuffer.getSlotMap(slotMap);
+
+        if (slot >= header.numSlots)
+        {
+            block = header.rblock;
+            slot = 0;
+        }
+        else if (slotMap[slot] == SLOT_UNOCCUPIED)
+        {
+            slot++;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (block == -1)
+    {
+        return E_NOTFOUND;
+    }
+
+    RecId nextRecId{block, slot};
+    RelCacheTable::setSearchIndex(relId, &nextRecId);
+
+    RecBuffer recBuffer(block);
+    recBuffer.getRecord(record, slot);
 
     return SUCCESS;
 }
