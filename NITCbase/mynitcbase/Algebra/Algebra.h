@@ -7,6 +7,7 @@
 
 class Algebra {
  public:
+  static long long ncmps;
   // Insert
   static int insert(char relName[ATTR_SIZE], int numberOfAttributes, char record[][ATTR_SIZE]);
 
@@ -22,6 +23,8 @@ class Algebra {
   // Join
   static int join(char srcRelOne[ATTR_SIZE], char srcRelTwo[ATTR_SIZE], char targetRel[ATTR_SIZE],
                   char attrOne[ATTR_SIZE], char attrTwo[ATTR_SIZE]);
+
+  static int print(char srcRel[ATTR_SIZE]);
 };
 
 #endif  // NITCBASE_ALGEBRA_H

@@ -3,6 +3,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+using namespace std;
+
+long long Algebra::ncmps = 0;
 
 int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr[ATTR_SIZE], int op, char strVal[ATTR_SIZE])
 {
@@ -19,8 +22,10 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
         return E_ATTRNOTEXIST;
     }
 
-    int type = attrCatEntry.attrType;
+    /*** Convert strVal to an attribute of data type NUMBER or STRING ***/
+
     Attribute attrVal;
+    int type = attrCatEntry.attrType;
     if (type == NUMBER)
     {
         bool isNumber(char *);
@@ -68,12 +73,13 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
 
     Attribute record[src_nAttrs];
     RelCacheTable::resetSearchIndex(srcRelId);
-    // AttrCacheTable::resetSearchIndex(srcRelId, attr);
-
+    AttrCacheTable::resetSearchIndex(srcRelId, attr);
+    Algebra::ncmps = 0;
+    int nrecs = 0;
     while (BlockAccess::search(srcRelId, record, attr, attrVal, op) == SUCCESS)
     {
         ret = BlockAccess::insert(targetRelId, record);
-
+        nrecs++;
         if (ret != SUCCESS)
         {
             Schema::closeRel(targetRel);
@@ -82,6 +88,8 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
         }
     }
     Schema::closeRel(targetRel);
+    printf("Number of comparisions: %lld\n", Algebra::ncmps);
+    printf("Number of records selected : %d\n", nrecs);
 
     return SUCCESS;
 }
@@ -97,7 +105,7 @@ int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE])
     RelCatEntry relCatEntry;
     RelCacheTable::getRelCatEntry(srcRelId, &relCatEntry);
     int nAttrs = relCatEntry.numAttrs;
-    
+
     char attrNames[nAttrs][ATTR_SIZE];
     int attrTypes[nAttrs];
     for (int i = 0; i < nAttrs; i++)
@@ -119,7 +127,7 @@ int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE])
         Schema::deleteRel(targetRel);
         return targetRelId;
     }
-    
+
     RelCacheTable::resetSearchIndex(srcRelId);
     Attribute record[nAttrs];
 
@@ -202,7 +210,7 @@ int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], int tar_
 }
 
 #if 0
-int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr[ATTR_SIZE], int op, char strVal[ATTR_SIZE])
+int Algebra::print(char srcRel[ATTR_SIZE])
 {
     int srcRelId = OpenRelTable::getRelId(srcRel);
     if (srcRelId == E_RELNOTOPEN)

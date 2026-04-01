@@ -289,7 +289,23 @@ int BlockAccess::insert(int relId, Attribute *record)
 
 int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], Attribute attrVal, int op)
 {
-    RecId recId = linearSearch(relId, attrName, attrVal, op);
+    RecId recId;
+
+    AttrCatEntry attrCatEntry;
+    int ret = AttrCacheTable::getAttrCatEntry(relId, attrName, &attrCatEntry);
+    if (ret != SUCCESS)
+        return ret;
+
+    int rootBlock = attrCatEntry.rootBlock;
+    if (rootBlock == -1)
+    {
+        recId = BlockAccess::linearSearch(relId, attrName, attrVal, op);
+    }
+    else
+    {
+        recId = BPlusTree::bPlusSearch(relId, attrName, attrVal, op);
+    }
+
     if (recId.block == -1 && recId.slot == -1)
         return E_NOTFOUND;
 
@@ -418,11 +434,6 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE])
     return SUCCESS;
 }
 
-/*
-NOTE: the caller is expected to allocate space for the argument `record` based
-      on the size of the relation. This function will only copy the result of
-      the projection onto the array pointed to by the argument.
-*/
 int BlockAccess::project(int relId, Attribute *record)
 {
     RecId prevRecId;

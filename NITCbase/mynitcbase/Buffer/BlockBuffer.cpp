@@ -1,5 +1,5 @@
 #include "BlockBuffer.h"
-
+#include "../Algebra/Algebra.h"
 #include <cstdlib>
 #include <cstring>
 
@@ -269,9 +269,68 @@ int RecBuffer::setSlotMap(unsigned char *slotMap)
 	return SUCCESS;
 }
 
+IndBuffer::IndBuffer(char blockType) : BlockBuffer(blockType) {}
+
+IndBuffer::IndBuffer(int blockNum) : BlockBuffer(blockNum) {}
+
+IndInternal::IndInternal() : IndBuffer('I') {}
+
+IndInternal::IndInternal(int blockNum) : IndBuffer(blockNum) {}
+
+IndLeaf::IndLeaf() : IndBuffer('L') {}
+
+IndLeaf::IndLeaf(int blockNum) : IndBuffer(blockNum) {}
+
+int IndInternal::getEntry(void *ptr, int indexNum)
+{
+	if (indexNum < 0 || indexNum >= MAX_KEYS_INTERNAL)
+		return E_OUTOFBOUND;
+
+	unsigned char *bufferPtr;
+	int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+	if (ret != SUCCESS)
+		return ret;
+
+	struct InternalEntry *internalEntry = (struct InternalEntry *)ptr;
+
+	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * (sizeof(int) + ATTR_SIZE));
+
+	memcpy(&(internalEntry->lChild), entryPtr, sizeof(int32_t));
+	memcpy(&(internalEntry->attrVal), entryPtr + sizeof(int32_t), sizeof(Attribute));
+	memcpy(&(internalEntry->rChild), entryPtr + sizeof(int32_t) + sizeof(Attribute), sizeof(int32_t));
+
+	return SUCCESS;
+}
+
+int IndLeaf::getEntry(void *ptr, int indexNum)
+{
+	if (indexNum < 0 || indexNum >= MAX_KEYS_INTERNAL)
+		return E_OUTOFBOUND;
+
+	unsigned char *bufferPtr;
+	int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+	if (ret != SUCCESS)
+		return ret;
+
+	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * LEAF_ENTRY_SIZE);
+	memcpy((struct Index *)ptr, entryPtr, LEAF_ENTRY_SIZE);
+
+	return SUCCESS;
+}
+
+int IndInternal::setEntry(void *ptr, int indexNum)
+{
+	return 0;
+}
+
+int IndLeaf::setEntry(void *ptr, int indexNum)
+{
+	return 0;
+}
+
 int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType)
 {
-
+	Algebra::ncmps++;
 	double diff;
 	if (attrType == STRING)
 		diff = strcmp(attr1.sVal, attr2.sVal);
@@ -283,6 +342,5 @@ int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType)
 		return 1;
 	if (diff < 0)
 		return -1;
-	if (diff == 0)
-		return 0;
+	return 0;
 }

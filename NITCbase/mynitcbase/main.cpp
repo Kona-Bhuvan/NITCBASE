@@ -435,6 +435,26 @@ void stage9ex3()
 	*/
 }
 
+void stage10ex1()
+{
+	/*
+	open table Numbers;
+	SELECT * FROM Numbers INTO BigNumbers WHERE key > 165000;
+
+	drop table BigNumbers;
+	*/
+}
+void stage10ex2()
+{
+	/*
+	Algebra::ncmps = 0;
+	open table Numbers;
+	SELECT * FROM Numbers INTO BigNumbers WHERE key > 165000;
+
+	drop table BigNumbers;
+	*/
+}
+
 int main(int argc, char *argv[])
 {
 	/* Initialize the Run Copy of Disk */
@@ -474,6 +494,9 @@ int main(int argc, char *argv[])
 	// stage9ex1();  /* Testing different SELECT operations */
 	// stage9ex2();  /* Checking Error Conditions */
 	// stage9ex3();  /* Implementing multi-step SELECT operations */
+
+	// stage10ex1(); /*  */
+	// stage10ex2(); /*  */
 
 	return FrontendInterface::handleFrontend(argc, argv);
 	// return 0;
