@@ -293,7 +293,7 @@ int IndInternal::getEntry(void *ptr, int indexNum)
 
 	struct InternalEntry *internalEntry = (struct InternalEntry *)ptr;
 
-	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * (sizeof(int) + ATTR_SIZE));
+	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * (sizeof(int32_t) + ATTR_SIZE));
 
 	memcpy(&(internalEntry->lChild), entryPtr, sizeof(int32_t));
 	memcpy(&(internalEntry->attrVal), entryPtr + sizeof(int32_t), sizeof(Attribute));
@@ -302,9 +302,34 @@ int IndInternal::getEntry(void *ptr, int indexNum)
 	return SUCCESS;
 }
 
-int IndLeaf::getEntry(void *ptr, int indexNum)
+int IndInternal::setEntry(void *ptr, int indexNum)
 {
 	if (indexNum < 0 || indexNum >= MAX_KEYS_INTERNAL)
+		return E_OUTOFBOUND;
+
+	unsigned char *bufferPtr;
+	int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+	if (ret != SUCCESS)
+		return ret;
+
+	struct InternalEntry *internalEntry = (struct InternalEntry *)ptr;
+
+	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * (sizeof(int32_t) + ATTR_SIZE));
+
+	memcpy(entryPtr, &(internalEntry->lChild), sizeof(int32_t));
+	memcpy(entryPtr + sizeof(int32_t), &(internalEntry->attrVal), ATTR_SIZE);
+	memcpy(entryPtr + sizeof(Attribute) + sizeof(int32_t), &(internalEntry->rChild), sizeof(int32_t));
+
+	ret = StaticBuffer::setDirtyBit(this->blockNum);
+	if (ret != SUCCESS)
+		return ret;
+
+	return SUCCESS;
+}
+
+int IndLeaf::getEntry(void *ptr, int indexNum)
+{
+	if (indexNum < 0 || indexNum >= MAX_KEYS_LEAF)
 		return E_OUTOFBOUND;
 
 	unsigned char *bufferPtr;
@@ -318,14 +343,25 @@ int IndLeaf::getEntry(void *ptr, int indexNum)
 	return SUCCESS;
 }
 
-int IndInternal::setEntry(void *ptr, int indexNum)
-{
-	return 0;
-}
-
 int IndLeaf::setEntry(void *ptr, int indexNum)
 {
-	return 0;
+
+	if (indexNum < 0 || indexNum >= MAX_KEYS_LEAF)
+		return E_OUTOFBOUND;
+
+	unsigned char *bufferPtr;
+	int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+	if (ret != SUCCESS)
+		return ret;
+
+	unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * LEAF_ENTRY_SIZE);
+	memcpy(entryPtr, (struct Index *)ptr, LEAF_ENTRY_SIZE);
+
+	ret = StaticBuffer::setDirtyBit(this->blockNum);
+	if (ret != SUCCESS)
+		return ret;
+
+	return SUCCESS;
 }
 
 int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType)

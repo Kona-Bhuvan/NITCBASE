@@ -123,3 +123,40 @@ int Schema::deleteRel(char *relName)
     int retVal = BlockAccess::deleteRelation(relName);
     return retVal;
 }
+
+int Schema::createIndex(char relName[ATTR_SIZE],char attrName[ATTR_SIZE]){
+    if (strcmp(RELCAT_RELNAME, relName) == 0 || strcmp(ATTRCAT_RELNAME, relName) == 0)
+        return E_NOTPERMITTED;
+
+    int relId = OpenRelTable::getRelId(relName);
+    if (relId == E_RELNOTOPEN)
+        return E_RELNOTOPEN;
+
+    return BPlusTree::bPlusCreate(relId, attrName);
+}
+
+int Schema::dropIndex(char *relName, char *attrName) {
+    if (strcmp(RELCAT_RELNAME, relName) == 0 || strcmp(ATTRCAT_RELNAME, relName) == 0)
+        return E_NOTPERMITTED;
+
+    int relId = OpenRelTable::getRelId(relName);
+    if (relId == E_RELNOTOPEN)
+        return E_RELNOTOPEN;
+
+    struct AttrCatEntry attrCatEntry;
+    int ret = AttrCacheTable::getAttrCatEntry(relId, attrName, &attrCatEntry);
+    if (ret != SUCCESS)
+        return ret;
+
+    int rootBlock = attrCatEntry.rootBlock;
+
+    if (rootBlock == -1)
+        return E_NOINDEX;
+
+    BPlusTree::bPlusDestroy(rootBlock);
+
+    attrCatEntry.rootBlock = -1;
+    AttrCacheTable::setAttrCatEntry(relId, attrName, &attrCatEntry);
+
+    return SUCCESS;
+}

@@ -438,20 +438,51 @@ void stage9ex3()
 void stage10ex1()
 {
 	/*
-	open table Numbers;
+	OPEN TABLE Numbers;
 	SELECT * FROM Numbers INTO BigNumbers WHERE key > 165000;
 
-	drop table BigNumbers;
+	DROP TABLE BigNumbers;
+
+	CREATE INDEX ON Numbers.key;
+
+	SELECT * FROM Numbers INTO BigNumbers WHERE key > 165000;
+
+	DROP TABLE BigNumbers;
 	*/
 }
 void stage10ex2()
 {
 	/*
 	Algebra::ncmps = 0;
-	open table Numbers;
+	OPEN TABLE Numbers;
 	SELECT * FROM Numbers INTO BigNumbers WHERE key > 165000;
 
-	drop table BigNumbers;
+	DROP TABLE BigNumbers;
+	*/
+}
+
+void stage11ex1()
+{
+	/*
+	RUN s11text.txt;
+
+	SCHEMA S11_Students
+	EXPORT S11_c_Students c_students.csv
+	EXPORT S11_9_Students 9_students.csv
+	*/
+}
+void stage11ex2()
+{
+	/*
+	CREATE INDEX ON RELATIONCAT.RelName;
+	DROP INDEX ON S11_Students.name;
+	OPEN TABLE S11_Students;
+	CREATE INDEX ON S11_Students.name;
+
+	# Error: This operation is not permitted
+	# Error: Relation is not open
+	# Relation S11_Students opened successfully
+	# Error: No index
 	*/
 }
 
@@ -495,8 +526,11 @@ int main(int argc, char *argv[])
 	// stage9ex2();  /* Checking Error Conditions */
 	// stage9ex3();  /* Implementing multi-step SELECT operations */
 
-	// stage10ex1(); /*  */
-	// stage10ex2(); /*  */
+	// stage10ex1(); /* Searching using Indexing */
+	// stage10ex2(); /* Printing the number of comparisons made */
+
+	// stage11ex1(); /* Testing CREATE INDEX and DROP INDEX from file using RUN */
+	// stage11ex2(); /* Checking Error Conditions for CREATE INDEX and DROP INDEX */
 
 	return FrontendInterface::handleFrontend(argc, argv);
 	// return 0;
