@@ -486,6 +486,75 @@ void stage11ex2()
 	*/
 }
 
+void stage12ex1()
+{
+	/*
+	OPEN TABLE Events;
+	OPEN TABLE Locations;
+	OPEN TABLE Participants;
+
+	INSERT INTO EVENTS VALUES FROM events.csv;
+	INSERT INTO LOCATIONS VALUES FROM locations.csv;
+	INSERT INTO PARTICIPANTS VALUES FROM participants.csv;
+
+	SELECT name FROM Locations JOIN Events INTO EventLocations WHERE Locations.name = Events.location;
+
+	SELECT * FROM Events JOIN Participants INTO A1 WHERE Events.title = Participants.event;
+	ALTER TABLE RENAME A1 COLUMN title TO eventName;
+	OPEN TABLE A1;
+	SELECT regNo, eventName FROM A1 INTO AudiPeople where location=Audi;
+
+	SELECT * FROM Participants JOIN Events INTO M1 where Participants.event = Events.title;
+	OPEN TABLE M1;
+	SELECT * FROM Locations JOIN M1 INTO M2 WHERE Locations.name = M1.location;
+	ALTER TABLE RENAME M2 COLUMN event TO eventName;
+	OPEN TABLE M2;
+	SELECT * FROM M2 INTO M3 WHERE capacity<200;
+	OPEN TABLE M3;
+	SELECT regNo, eventName FROM M3 INTO MiniEventPeople WHERE capacity > 100;
+	*/
+}
+void stage12ex2()
+{
+	/*
+	CREATE TABLE EventRating(id NUM, title STR, rating NUM);
+	OPEN TABLE EventRating;
+	OPEN TABLE Events;
+	SELECT * FROM Events JOIN EventRating INTO LocRating WHERE Events.id = EventRating.id;
+	SELECT * FROM Events JOIN EventRating INTO LocRating WHERE Events.id = EventRating.name;
+	SELECT * FROM Events JOIN EventRating INTO LocRating WHERE Events.id = EventRating.title;
+	CLOSE TABLE EventRating;
+	DROP TABLE EventRating;
+
+	# Relation EventRating created successfully
+	# Error: Duplicate attributes found
+	# Error: Attribute does not exist
+	# Error: Mismatch in attribute type
+	*/
+}
+void stage12ex3()
+{
+	/*
+	CREATE TABLE Organizers(name STR, eventId NUM);
+	OPEN TABLE Organizers;
+	INSERT INTO Organizers VALUES FROM s12organizers.csv;
+	OPEN TABLE Events;
+	OPEN TABLE Locations;
+	OPEN TABLE Participants;
+
+	SELECT * FROM Participants JOIN Events INTO O1 WHERE Participants.event = Events.title;
+	OPEN TABLE O1;
+	SELECT regNo, location, name FROM Organizers JOIN O1 INTO P_Info WHERE Organizers.eventId = O1.id;
+
+	CLOSE TABLE O1;
+	ALTER TABLE RENAME O1 COLUMN event TO eventName;
+	OPEN TABLE O1;
+	SELECT regNo, eventName, name FROM Organizers JOIN O1 INTO O2 WHERE Organizers.eventId = O1.id;
+	OPEN TABLE O2;
+	SELECT regNo, eventName FROM O2 INTO Thomas_list WHERE name = Thomas;
+	*/
+}
+
 int main(int argc, char *argv[])
 {
 	/* Initialize the Run Copy of Disk */
@@ -531,6 +600,10 @@ int main(int argc, char *argv[])
 
 	// stage11ex1(); /* Testing CREATE INDEX and DROP INDEX from file using RUN */
 	// stage11ex2(); /* Checking Error Conditions for CREATE INDEX and DROP INDEX */
+
+	// stage12ex1(); /* Testing JOIN command */
+	// stage12ex2(); /* Checking Error Conditions for JOIN */
+	// stage12ex3(); /* Testing JOIN command */
 
 	return FrontendInterface::handleFrontend(argc, argv);
 	// return 0;

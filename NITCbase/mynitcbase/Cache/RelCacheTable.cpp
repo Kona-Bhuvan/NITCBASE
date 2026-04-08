@@ -52,7 +52,6 @@ void RelCacheTable::relCatEntryToRecord(RelCatEntry *relCatEntry, union Attribut
     record[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal = relCatEntry->numSlotsPerBlk;
 }
 
-
 int RelCacheTable::getSearchIndex(int relId, RecId *searchIndex)
 {
     if (relId < 0 || relId >= MAX_OPEN)
@@ -64,7 +63,7 @@ int RelCacheTable::getSearchIndex(int relId, RecId *searchIndex)
     {
         return E_RELNOTOPEN;
     }
-    
+
     *searchIndex = relCache[relId]->searchIndex;
     return SUCCESS;
 }

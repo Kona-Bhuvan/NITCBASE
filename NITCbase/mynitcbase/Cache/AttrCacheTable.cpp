@@ -144,10 +144,8 @@ int AttrCacheTable::setSearchIndex(int relId, int attrOffset, IndexId *searchInd
     if (relId < 0 || relId >= MAX_OPEN)
         return E_OUTOFBOUND;
 
-
     if (attrCache[relId] == nullptr)
         return E_RELNOTOPEN;
-
 
     for (AttrCacheEntry *entry = attrCache[relId]; entry != nullptr; entry = entry->next)
     {

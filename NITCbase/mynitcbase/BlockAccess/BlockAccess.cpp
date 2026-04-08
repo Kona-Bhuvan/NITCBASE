@@ -291,11 +291,12 @@ int BlockAccess::insert(int relId, Attribute *record)
         int ret = AttrCacheTable::getAttrCatEntry(relId, attrOffset, &attrCatEntry);
 
         int rootBlock = attrCatEntry.rootBlock;
-        if(rootBlock != -1)
+        if (rootBlock != -1)
         {
             int retVal = BPlusTree::bPlusInsert(relId, attrCatEntry.attrName, record[attrOffset], rec_id);
 
-            if (retVal == E_DISKFULL) {
+            if (retVal == E_DISKFULL)
+            {
                 flag = E_INDEX_BLOCKS_RELEASED;
             }
         }

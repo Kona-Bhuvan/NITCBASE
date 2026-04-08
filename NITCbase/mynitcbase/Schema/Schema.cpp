@@ -124,7 +124,8 @@ int Schema::deleteRel(char *relName)
     return retVal;
 }
 
-int Schema::createIndex(char relName[ATTR_SIZE],char attrName[ATTR_SIZE]){
+int Schema::createIndex(char relName[ATTR_SIZE], char attrName[ATTR_SIZE])
+{
     if (strcmp(RELCAT_RELNAME, relName) == 0 || strcmp(ATTRCAT_RELNAME, relName) == 0)
         return E_NOTPERMITTED;
 
@@ -135,7 +136,8 @@ int Schema::createIndex(char relName[ATTR_SIZE],char attrName[ATTR_SIZE]){
     return BPlusTree::bPlusCreate(relId, attrName);
 }
 
-int Schema::dropIndex(char *relName, char *attrName) {
+int Schema::dropIndex(char *relName, char *attrName)
+{
     if (strcmp(RELCAT_RELNAME, relName) == 0 || strcmp(ATTRCAT_RELNAME, relName) == 0)
         return E_NOTPERMITTED;
 

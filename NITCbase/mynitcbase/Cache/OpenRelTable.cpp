@@ -286,11 +286,11 @@ int OpenRelTable::closeRel(int relId)
     if (RelCacheTable::relCache[relId]->dirty == true)
     {
         Attribute record[RELCAT_NO_ATTRS];
-		RelCatEntry relCatEntry;
-		RelCacheTable::getRelCatEntry(relId, &relCatEntry);
-		RelCacheTable::relCatEntryToRecord(&relCatEntry, record);
+        RelCatEntry relCatEntry;
+        RelCacheTable::getRelCatEntry(relId, &relCatEntry);
+        RelCacheTable::relCatEntryToRecord(&relCatEntry, record);
         RecId recId = RelCacheTable::relCache[relId]->recId;
-        
+
         RecBuffer relCatBlock(recId.block);
         relCatBlock.setRecord(record, recId.slot);
     }
@@ -314,7 +314,7 @@ int OpenRelTable::closeRel(int relId)
         free(entry);
     }
     AttrCacheTable::attrCache[relId] = nullptr;
-    
+
     tableMetaInfo[relId].free = true;
 
     return SUCCESS;
