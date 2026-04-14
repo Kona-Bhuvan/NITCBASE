@@ -28,7 +28,7 @@ Located in the `/Disk` directory, this simulates the physical hardware. It manag
 NITCbase
 ├── Disk/                       # Disk Emulator and control tools
 │   ├── disk                    # Simulated disk file
-│   └── disk_run_copy           # Utility for disk management
+│   └── disk_run_copy           # Run copy of the disk
 ├── Files/                      # Data files for testing and execution
 │   ├── Batch_Execution_Files/  # Batch scripts (e.g., s8test.txt, s11test.txt)
 │   ├── Input_Files/            # CSV datasets for relation loading
@@ -105,3 +105,4 @@ docker run -it nitcbase
 
 ## 📖 Acknowledgments
 Developed as part of the Database Management Systems laboratory course at the **National Institute of Technology Calicut**.
+Guide: https://nitcbase.github.io/
